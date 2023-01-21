@@ -15,7 +15,7 @@ pipeline {
             }
             steps {
                 script {
-                    app = docker.build("wessamabdelwahab/react-app")
+                    app = docker.build("kumaran0076/react-app")
                     app.inside {
                         sh 'echo $(curl localhost:1233)'
                     }
@@ -41,7 +41,7 @@ pipeline {
             }
             steps {
                     script {
-                        sh "docker pull wessamabdelwahab/react-app:${env.BUILD_NUMBER}"
+                        sh "docker pull kumaran0076/react-app:${env.BUILD_NUMBER}"
                         try {
                             sh "docker stop react-app"
                             sh "docker rm react-app"
@@ -52,26 +52,26 @@ pipeline {
                     }
             }
         }
-        
+
         stage("Check HTTP Response") {
             steps {
                 script {
                     final String url = "http://localhost:1233"
-                    
+
                     final String response = sh(script: "curl -o /dev/null -s -w '%{http_code}\\n' $url", returnStdout: true).trim()
-                    
+
                     if (response == "200") {
                         echo response
-                        println "Successful Response Code" 
+                        println "Successful Response Code"
                     } else {
                         echo response
-                        println "Error Response Code" 
+                        println "Error Response Code"
                     }
 
                 }
             }
         }
-        
+
         stage('DeployToProduction') {
             when {
                 branch 'main'
@@ -80,14 +80,14 @@ pipeline {
                 input 'Does the staging environment look OK? Did You get 200 response?'
                  milestone(1)
                     script {
-                        sh "docker pull wessamabdelwahab/react-app:${env.BUILD_NUMBER}"
+                        sh "docker pull kumaran0076/react-app:${env.BUILD_NUMBER}"
                         try {
                             sh "docker stop react-app"
                             sh "docker rm react-app"
                         } catch (err) {
                             echo: 'caught error: $err'
                         }
-                        sh "docker run --restart always --name react-app -p 1233:80 -d wessamabdelwahab/react-app:${env.BUILD_NUMBER}"
+                        sh "docker run --restart always --name react-app -p 1233:80 -d kumaran0076/react-app:${env.BUILD_NUMBER}"
                     }
             }
         }
